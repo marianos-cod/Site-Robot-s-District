@@ -56,8 +56,8 @@ h2 { margin: 1.2rem 0 0; font-family: var(--font-display); font-weight: 700; let
 .heading-copy { max-width: 36rem; margin: 1.3rem 0 0; color: var(--muted); font-size: 1rem; line-height: 1.55; }
 
 /* 02 — Cabeçalho e navegação */
-.site-header { position: fixed; z-index: 100; inset: 0 0 auto; color: var(--paper); transition: color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease); }
-.site-header.is-scrolled { background: rgba(245,245,245,.95); color: var(--purple-900); box-shadow: 0 1px 0 rgba(48,0,74,.1); backdrop-filter: blur(16px); }
+.site-header { position: fixed; z-index: 100; inset: 0 0 auto; background-color: transparent; color: var(--paper); transition: color .28s var(--ease), background-color .28s var(--ease), box-shadow .28s var(--ease); }
+.site-header.is-scrolled { background-color: #fff; color: var(--purple-900); box-shadow: 0 6px 24px rgba(48,0,74,.12); backdrop-filter: blur(16px); }
 .header-inner { display: flex; min-height: 5rem; padding-inline: max(1.25rem, calc((100vw - 1380px)/2)); align-items: center; justify-content: space-between; gap: 1rem; }
 .brand { display: inline-flex; flex: 0 0 auto; align-items: center; gap: .55rem; }
 .brand img { width: 2.55rem; height: 2.55rem; }
@@ -406,4 +406,133 @@ h2 { margin: 1.2rem 0 0; font-family: var(--font-display); font-weight: 700; let
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *,*::before,*::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+
+/* ==========================================================
+   MOVIMENTO — entradas ao rolar e movimento ambiente do hero
+   Inspirado nas animações Framer Motion da versão original.
+   ========================================================== */
+html.js-motion [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity .55s ease-out, transform .55s var(--ease);
+  will-change: opacity, transform;
+}
+html.js-motion [data-reveal].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.hero-halftone {
+  position: absolute;
+  z-index: -1;
+  right: -9rem;
+  bottom: -11rem;
+  width: 35rem;
+  height: 35rem;
+  border-radius: 50%;
+  background-image: radial-gradient(var(--yellow-400) 1.3px, transparent 1.4px);
+  background-size: 10px 10px;
+  opacity: .28;
+  mask-image: radial-gradient(circle, #000 10%, transparent 68%);
+}
+.hero-particle {
+  position: absolute;
+  z-index: -1;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: var(--yellow-400);
+  box-shadow: 0 0 1.4rem var(--yellow-400);
+}
+.hero-particle--one { top: 30%; left: 59%; }
+.hero-particle--two { top: 19%; right: 13%; width: .3rem; height: .3rem; }
+.hero-particle--three { right: 41%; bottom: 17%; width: .25rem; height: .25rem; }
+.mobile-nav {
+  visibility: hidden;
+  clip-path: inset(0 0 100% 0);
+  pointer-events: none;
+  transition: clip-path .36s var(--ease), visibility 0s linear .36s;
+}
+.mobile-nav.is-open {
+  visibility: visible;
+  clip-path: inset(0 0 0 0);
+  pointer-events: auto;
+  transition: clip-path .36s var(--ease), visibility 0s;
+}
+.mobile-nav-orb {
+  position: absolute;
+  top: -5rem;
+  right: -8rem;
+  width: 21rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 212, 62, .5);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3rem rgba(94, 0, 167, .23), 0 0 0 6rem rgba(255, 212, 62, .04);
+}
+.mobile-nav a {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 2.4rem 1fr auto;
+  min-height: 3.5rem;
+  transform: translateY(12px);
+  opacity: 0;
+  transition: transform .28s var(--ease), opacity .28s var(--ease);
+}
+.mobile-nav.is-open a { transform: translateY(0); opacity: 1; transition-delay: calc(var(--index, 0) * 35ms); }
+.mobile-nav:not(.is-open) a { transition-delay: 0ms; }
+@media (min-width: 900px) {
+  .hero-art { top: 5.8rem; right: -13rem; width: min(1160px, 87vw); height: 49rem; object-position: 70% center; transform: rotate(-2deg); }
+  .hero-shade { background: linear-gradient(90deg, var(--purple-900) 1%, rgba(48,0,74,.62) 30%, transparent 80%); }
+  .hero { background: radial-gradient(circle at 82% 40%, rgba(255,184,0,.17), transparent 22rem), linear-gradient(120deg,#30004A 0%,#4B007C 52%,#5E00A7 100%); }
+}
+@media (min-width: 640px) and (max-width: 899px) {
+  .hero-art { right: -14rem; width: min(1100px,114vw); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-particle--one { animation: float-a 5s ease-in-out infinite alternate; }
+  .hero-particle--two { animation: float-b 6s ease-in-out infinite alternate; }
+  .hero-particle--three { animation: float-c 4.4s ease-in-out infinite alternate; }
+  .hero-art { animation: hero-drift 10s ease-in-out infinite alternate; }
+  .back-to-top span { animation: plane-bob 2.7s ease-in-out infinite alternate; }
+  .scroll-cue span { animation: cue-bob 1.6s ease-in-out infinite alternate; }
+  .flight-path svg path:first-child { animation: route-drift 8s linear infinite; }
+  .project-dialog[open] { animation: dialog-enter .22s var(--ease) both; }
+}
+@keyframes float-a { to { transform: translate(16px,-19px); } }
+@keyframes float-b { to { transform: translate(-21px,13px); } }
+@keyframes float-c { to { transform: translate(10px,18px); } }
+@keyframes hero-drift { to { transform: rotate(-1deg) translate(-8px,5px); } }
+@keyframes plane-bob { to { transform: translateY(-4px); } }
+@keyframes cue-bob { to { transform: translateY(4px); } }
+@keyframes route-drift { to { stroke-dashoffset: -52; } }
+@keyframes dialog-enter { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  html.js-motion [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .hero-particle,.hero-art,.back-to-top span,.scroll-cue span,.flight-path svg path:first-child { animation: none !important; }
+}
+
+html.js-motion [data-reveal] { transition-delay: var(--reveal-delay, 0ms); }
+
+
+/* Fallback nativo: no Chrome/Edge recentes, a cor do cabeçalho acompanha o scroll sem depender do JS. */
+@supports (animation-timeline: scroll()) {
+  .site-header {
+    animation: header-scroll-state linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0px 36px;
+  }
+  @keyframes header-scroll-state {
+    from { background-color: transparent; color: var(--paper); box-shadow: 0 0 0 rgba(48,0,74,0); }
+    to { background-color: #fff; color: var(--purple-900); box-shadow: 0 6px 24px rgba(48,0,74,.12); }
+  }
+}
+
+@supports (animation-timeline: scroll()) and (animation-range: 0px 36px) {
+  .site-header { transition: none; }
+}
+@supports (animation-timeline: scroll()) and (not (animation-range: 0px 36px)) {
+  .site-header { animation: none; }
 }
